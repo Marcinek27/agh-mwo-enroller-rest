@@ -36,10 +36,10 @@ public class ParticipantRestController {
         if (participant == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-
         return new ResponseEntity<Participant>(participant, HttpStatus.OK);
     }
-
+    
+    // POST http://localhost:8080/participants/user3
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<?> registerParticipant(@RequestBody Participant participant) {
         if (participantService.findByLogin(participant.getLogin()) != null) {
@@ -48,7 +48,7 @@ public class ParticipantRestController {
                     HttpStatus.CONFLICT);
         }
         participantService.add(participant);
-        return new ResponseEntity<Participant>(participant, HttpStatus.OK);
+        return new ResponseEntity<Participant>(participant, HttpStatus.CREATED);
     }
 
     // DELETE http://localhost:8080/participants/user2
