@@ -39,4 +39,10 @@ public class MeetingService {
         session.merge(meeting);
         transaction.commit();
     }
+
+    public void delete(Meeting meeting) {
+        Transaction transaction = this.session.beginTransaction();
+        session.delete(meeting);
+        transaction.commit();
+    }
 }

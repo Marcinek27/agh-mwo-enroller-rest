@@ -75,7 +75,7 @@ public class MeetingRestController {
         }
         foundMeeting.addParticipant(foundParticipant);
         meetingService.update(foundMeeting);
-        return new ResponseEntity<Meeting>(foundMeeting, HttpStatus.OK);
+        return new ResponseEntity<Participant>(foundParticipant, HttpStatus.OK);
     }
 
     // GET http://localhost:8080/meetings/2/participants
@@ -88,6 +88,48 @@ public class MeetingRestController {
         Collection<Participant> participants = foundMeeting.getParticipants();
         return new ResponseEntity<Collection<Participant>>(participants, HttpStatus.OK);
     }
+
+    // DELETE http://localhost:8080/meetings/4
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> deleteMeeting(@PathVariable("id") long id) {
+        Meeting meeting = meetingService.findById(id);
+        if (meeting == null) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        meetingService.delete(meeting);
+        return new ResponseEntity<Meeting>(meeting, HttpStatus.OK);
+    }
+
+    // PUT http://localhost:8080/meetings/4
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<?> updateMeeting(@PathVariable("id") long id, @RequestBody Meeting meeting) {
+        Meeting foundMeeting = meetingService.findById(id);
+        if (foundMeeting == null) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        foundMeeting.setTitle(meeting.getTitle());
+        foundMeeting.setDescription(meeting.getDescription());
+        foundMeeting.setDate(meeting.getDate());
+        meetingService.update(foundMeeting);
+        return new ResponseEntity<Meeting>(foundMeeting, HttpStatus.OK);
+    }
     
-    // Usuwanie uczestnika ze spotkania
+    // delete participant from meeting
+    // DEL http://localhost:8080/meetings/5/participants
+    @RequestMapping(value = "/{id}/participants", method = RequestMethod.DELETE)
+    public ResponseEntity<?> deleteParticipantForMeeting(@PathVariable("id") long id,
+            @RequestBody Participant participant) {
+        Meeting foundMeeting = meetingService.findById(id);
+        Participant foundParticipant = participantService.findByLogin(participant.getLogin());
+        if (foundMeeting == null) {
+            return new ResponseEntity("Meeting not found.", HttpStatus.NOT_FOUND);
+        }
+        if (foundParticipant == null) {
+            return new ResponseEntity("Unable to remove participant. A participant with login " + participant.getLogin()
+                    + " does not exist.", HttpStatus.NOT_FOUND);
+        }
+        foundMeeting.removeParticipant(foundParticipant);
+        meetingService.update(foundMeeting);
+        return new ResponseEntity<Participant>(foundParticipant, HttpStatus.OK);
+    }
 }
